@@ -23,7 +23,9 @@ dependencies = [
     "jupyterlab",
     "pandas",
     "openpyxl",
-    "numpy"
+    "numpy",
+    "google-cloud-bigquery",
+    "pyarrow"
 ]
 
 [project.urls]

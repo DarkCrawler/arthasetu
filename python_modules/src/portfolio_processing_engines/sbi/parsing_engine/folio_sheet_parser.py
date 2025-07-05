@@ -90,18 +90,19 @@ def generate_holdings_map_ds(df: DataFrame):
                 current_sub_section_type = mf_component_section_mapping[current_section_type]['sublist'][row.iloc[0]]
             elif row.iloc[0] not in ommit_rows:
                 holdings = {
-                    'inst_name': row['inst_name'],
+                    'inst_name': str(row['inst_name']),
                     'isin': row['isin'],
                     'sector': row['sector'],
                     'quantity': row['quantity'],
                     # 'quantity':row['quantity'].str.extract(r'\((\d+)\)')
                     'market_value_lakhs': row['market_value_lakhs'] if row['market_value_lakhs'] != 'NIL' else 0.0,
-                    'aum_percent': row['aum_percent'],
+                    'aum_percent': row['aum_percent'] if row['aum_percent'] != 'NIL' else 0.0,
                     # 'esg_score':row['esg_score'] if ,
-                    'esg_score': row.get('esg_score', '') or '',
+                    # 'esg_score': row.get('esg_score', '') or '',
                     'notes_symbols': row['notes_symbols'],
-                    'ytm_percent': row['ytm_percent'],
-                    'ytc_percent': row['ytc_percent']
+                    'notes_symbols': '',
+                    'ytm_percent': row['ytm_percent'] if row['ytm_percent'] != 'NIL' else 0.0,
+                    'ytc_percent': row['ytc_percent'] if row['ytc_percent'] != 'NIL' else 0.0
                 }
                 section_dataframes.setdefault(current_section_type, {}).setdefault(current_sub_section_type, []).append(
                     holdings)
@@ -138,7 +139,6 @@ def post_process(df: DataFrame, mf_fund_id: int, mf_fund_code: str, disclose_mon
 
     df['mf_fund_id'] = mf_fund_id
     df['mf_fund_code'] = mf_fund_code
-    df['fund_holder'] = 'SBI'
 
     # remove all NaN
 

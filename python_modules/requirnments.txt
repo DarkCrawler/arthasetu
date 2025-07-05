@@ -1,0 +1,16 @@
+# pandas dataframe specific
+gcsfs
+pandas
+openpyxl
+numpy
+
+
+# google bigquery
+google-cloud-bigquery
+pyarrow
+
+
+# fastapi
+fastapi[standard]
+pydantic
+uvicorn[standard]
