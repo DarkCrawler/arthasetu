@@ -1,9 +1,7 @@
 import pandas as pd
-from bq_writer import write_portfolio_to_bq
-from core_parser import parse_portfolio
+from portfolio_processing_engines.sbi.parsing_engine.core_parser import parse_portfolio
 
-
-# 5902
+from .bq_writer import write_portfolio_to_bq
 
 
 def create_complete_portfolio_ds(parsed_ds):

@@ -1,6 +1,6 @@
 import pandas as pd
-from folio_sheet_parser import generate_mf_ds
 from pandas import ExcelFile, DataFrame
+from portfolio_processing_engines.sbi.parsing_engine.folio_sheet_parser import generate_mf_ds
 
 
 def parse_index_sheet(xls_file_fp: ExcelFile):
