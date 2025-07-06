@@ -15,6 +15,7 @@ def write_portfolio_to_bq(df: DataFrame, schema_name: str):
     df['sector'] = df['sector'].apply(lambda x: '' if pd.isna(x) else str(x))
     df['aum_percent'] = df['aum_percent'].apply(lambda x: '' if pd.isna(x) else str(x))
     df['isin'] = df['isin'].apply(lambda x: '' if pd.isna(x) else str(x))
+    df["disclose_year"] = df["disclose_year"].astype(int)
 
     #######################
 

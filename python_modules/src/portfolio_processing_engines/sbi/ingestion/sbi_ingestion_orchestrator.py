@@ -1,7 +1,6 @@
 import pandas as pd
+from portfolio_processing_engines.sbi.ingestion.bq_writer import write_portfolio_to_bq
 from portfolio_processing_engines.sbi.parsing_engine.core_parser import parse_portfolio
-
-from .bq_writer import write_portfolio_to_bq
 
 
 def create_complete_portfolio_ds(parsed_ds):
@@ -21,7 +20,7 @@ def create_complete_portfolio_ds(parsed_ds):
     return portfolio_detailed_dfs, combined_df
 
 
-def orchestrate_portfolio_disclosure_process(file_path, mode, storage):
+def orchestrate_portfolio_disclosure_process(file_path, mode, storage, month: int, year: int):
     if mode == 'local':
         file_path = '/prototypes/sbi/all-schemes-monthly-portfolio---as-on-28th-february-2025.xlsx'
 
@@ -39,7 +38,7 @@ def orchestrate_portfolio_disclosure_process(file_path, mode, storage):
     if mode == 'gcp':
         gcs_strorage_path = file_path
 
-        parsed_ds = parse_portfolio(xls_file_path=file_path, mode=mode)
+        parsed_ds = parse_portfolio(xls_file_path=file_path, mode=mode, month=month, year=year)
 
         print('parsing of portfolio sheet complete....')
 
@@ -53,8 +52,32 @@ def orchestrate_portfolio_disclosure_process(file_path, mode, storage):
             print('Current supported storage mechanism only set to BQ')
 
 
+def get_month_and_year(file_path: str):
+    import re
+    import calendar
+    match = re.search(r"(\d{1,2})(st|nd|rd|th)-([a-z]+)-(\d{4})", file_path)
+    if match:
+        day, _, month_str, year = match.groups()
+        month_str_cap = month_str.capitalize()
+        month_num = list(calendar.month_name).index(month_str_cap)  # month_name[1] = "January"
+        return month_num, year
+
+    else:
+        print("Could not parse date.")
+
+
 if __name__ == "__main__":
     sheet_local_path = '/prototypes/sbi/all-schemes-monthly-portfolio---as-on-28th-february-2025.xlsx'
     gcs_path = 'gs://projx-tb-extracts-staging/pxsbi/all-schemes-monthly-portfolio---as-on-28th-february-2025.xlsx'
 
-    orchestrate_portfolio_disclosure_process(file_path=gcs_path, mode='gcp', storage='bq')
+    gcs_file_path_list = [
+        'gs://projx-tb-extracts-staging/pxsbi/all-schemes-monthly-portfolio---as-on-31st-january-2025.xlsx',
+        'gs://projx-tb-extracts-staging/pxsbi/all-schemes-monthly-portfolio---as-on-28th-february-2025.xlsx',
+        'gs://projx-tb-extracts-staging/pxsbi/all-schemes-monthly-portfolio---as-on-31st-march-2025.xlsx',
+        'gs://projx-tb-extracts-staging/pxsbi/all-schemes-monthly-portfolio---as-on-30th-april-2025.xlsx',
+        'gs://projx-tb-extracts-staging/pxsbi/all-schemes-monthly-portfolio---as-on-31st-may-2025.xlsx'
+    ]
+
+    for file_path in gcs_file_path_list:
+        month, year = get_month_and_year(file_path)
+        orchestrate_portfolio_disclosure_process(file_path=file_path, mode='gcp', storage='bq', month=month, year=year)
